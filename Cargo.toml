@@ -1,0 +1,8 @@
+[package]
+name = "elevation-api"
+version = "0.1.0"
+authors = ["Miles Granger <miles59923@gmail.com>"]
+
+[dependencies]
+ndarray = "0.11.1"
+netcdf = {git = "https://github.com/mhiley/rust-netcdf.git"}
