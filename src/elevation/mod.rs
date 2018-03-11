@@ -35,7 +35,7 @@ impl MinMax for ArrayD<f64> {
 }
 
 
-pub struct Elevation {
+pub struct ElevationTile {
     pub data: ArrayD<f64>,
     pub lats: ArrayD<f64>,
     pub lons: ArrayD<f64>,
@@ -43,9 +43,9 @@ pub struct Elevation {
     pub lon_min_max: (f64, f64)
 }
 
-impl Elevation {
+impl ElevationTile {
 
-    pub fn new(path: &Path) -> Elevation {
+    pub fn new(path: &Path) -> ElevationTile {
         // Create a new elevation resource
 
         let file: File = netcdf::open(path.to_str().unwrap()).unwrap();
@@ -57,7 +57,7 @@ impl Elevation {
         let lat_min_max = (lats.min_value(), lats.max_value());
         let lon_min_max = (lons.min_value(), lons.max_value());
 
-        Elevation {
+        ElevationTile {
             data,
             lats,
             lons,
