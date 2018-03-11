@@ -3,6 +3,7 @@ use serde_json;
 use std::path::Path;
 use std::fs::File;
 use std::io::prelude::*;
+use rayon::prelude::*;
 
 
 use elevation::ElevationTile;
@@ -66,7 +67,7 @@ pub fn make_summary_file() {
 }
 
 
-pub fn get_elevation(lat: &f64, lon: &f64, meta_datas: &Vec<ElevationTileFileMetaData>) -> Option<f64> {
+fn get_elevation(lat: &f64, lon: &f64, meta_datas: &Vec<ElevationTileFileMetaData>) -> Option<f64> {
 
     for resource in meta_datas {
 
@@ -78,4 +79,49 @@ pub fn get_elevation(lat: &f64, lon: &f64, meta_datas: &Vec<ElevationTileFileMet
         }
     }
     None // No matching tiles found
+}
+
+pub fn get_elevations(coords: Vec<(&f64, &f64)>, metas: &Vec<ElevationTileFileMetaData>) -> Vec<f64> {
+    /*
+    let mut elevations: Vec<Option<f64>> = Vec::new();
+
+    coords.par_iter()
+        .map(|&(lat, lon)| get_elevation(lat, lon, &metas))
+        .map(|result| match result {
+            Some(meters) => meters,
+            None => -9999.99
+        })
+        .collect::<Vec<f64>>()
+   */
+
+    let max_metas = 100;
+    let mut open_tiles: Vec<ElevationTile> = Vec::new();
+    let mut open_files: Vec<&String> = Vec::new();
+    let mut elevations: Vec<f64> = Vec::new();
+
+    for (lat, lon) in coords {
+        for resource in metas {
+
+            // Resource has coordinates holding both these lat and lon coords
+            if (lat >= &resource.coords[0] && lat <= &resource.coords[1]) &&
+                (lon >= &resource.coords[2] && lon <= &resource.coords[3]) {
+
+                // Check if it's in open tiles
+                if let Some(index) = open_files.iter().position(| f| *f == &resource.file) {
+                    let tile = &open_tiles[index];
+                    elevations.insert(0, tile.get_elevation(*lat, *lon))
+
+                // Not in open tiles, open it.
+                } else {
+                    let tile = ElevationTile::new(Path::new(&resource.file));
+                    elevations.insert(0, tile.get_elevation(*lat, *lon));
+                    open_files.insert(0, &resource.file);
+                    open_tiles.insert(0, tile);
+                }
+            }
+        }
+    }
+
+
+    elevations
 }

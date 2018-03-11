@@ -3,6 +3,7 @@ pub extern crate ndarray;
 pub extern crate glob;
 pub extern crate serde;
 pub extern crate serde_json;
+pub extern crate rayon;
 #[macro_use] pub extern crate serde_derive;
 
 use std::path::Path;
@@ -10,7 +11,6 @@ use glob::glob;
 
 mod elevation;
 mod utils;
-
 
 fn main() {
 
@@ -24,26 +24,20 @@ fn main() {
 
     let meta_data = utils::load_summary_file();
 
-    let lats = ndarray::Array::linspace(45.08904, 55.08904, 5);
-    let lons = ndarray::Array::linspace(80.85938, 85.85938, 5);
+    // Build collection of testing coordinates
+    let lats = ndarray::Array::linspace(45.08904, 55.08904, 50);
+    let lons = ndarray::Array::linspace(80.85938, 85.85938, 50);
+
+    let mut coords = Vec::with_capacity(lats.len() * lons.len() as usize);
 
     for lat in lats.iter() {
         for lon in lons.iter() {
-            let elevation = utils::get_elevation(lat, lon, &meta_data);
-
-            match elevation {
-                Some(meters) => println!("Elevation: {} meters at ({}, {})", meters, lat, lon),
-                None => println!("Unknown Elevation for ({}, {})", lat, lon)
-            }
+            coords.insert(0, (lat, lon));
         }
     }
 
-    //let path = Path::new("/home/milesg/Projects/elevation-api/data/out.nc");
-    //println!("File exists?: {}", path.exists());
-
-    //let elevation = ElevationTile::new(path);
-    //let val = elevation.get_elevation(lat, lon);
-
-    //println!("Elevation: {} - Lat bounds: {:?}, Lon bounds: {:?}", val, elevation.lat_min_max, elevation.lon_min_max);
-
+    println!("Getting coords for {} locations", coords.len());
+    let coords: Vec<(&f64, &f64)> = coords.to_vec();
+    let elevations = utils::get_elevations(coords, &meta_data);
+    println!("Finished!");
 }
