@@ -10,4 +10,6 @@ glob = "0.2.11"
 serde_json = "1.0.11"
 serde = "1.0.29"
 serde_derive = "1.0.29"
-rayon = "1.0.0"
+rocket = "0.3.6"
+rocket_codegen = "0.3.6"
+rocket_contrib = {features = ["json"], version = "*", default-features = false}
