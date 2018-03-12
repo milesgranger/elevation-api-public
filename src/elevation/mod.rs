@@ -171,16 +171,15 @@ pub fn make_summary_file() {
 }
 
 /// Function to grab elevations for a list of coordinates
-pub fn get_elevations(coords: Vec<(&f64, &f64)>, metas: &Vec<ElevationTileFileMetaData>) -> Vec<Elevation> {
+pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMetaData>) -> Vec<Elevation> {
     /*
         Fetch elevations for the given coordinates.
     */
     let mut tiles: HashMap<&String, ElevationTile> = HashMap::new();
     let mut elevations: Vec<Elevation> = Vec::new();
 
-    for (lat, lon) in coords {
-        for resource in metas {
-
+    for &(ref lat, ref lon) in coords.iter() {
+        for resource in metas.iter() {
             // Resource has coordinates holding both these lat and lon coords
             if (lat >= &resource.coords[0] && lat <= &resource.coords[1]) &&
                 (lon >= &resource.coords[2] && lon <= &resource.coords[3]) {
@@ -201,7 +200,7 @@ pub fn get_elevations(coords: Vec<(&f64, &f64)>, metas: &Vec<ElevationTileFileMe
 
                 // Create an elevation and insert it into the result vector.
                 let result = Elevation {lat: *lat, lon: *lon, elevation};
-                elevations.insert(0, result);
+                elevations.push(result);
             }
         }
     }
