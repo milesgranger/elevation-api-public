@@ -1,8 +1,8 @@
 use std::str::FromStr;
-use std::str::Utf8Error;
+use std::num::ParseFloatError;
 use rocket::request;
 use rocket::http;
-use elevation;
+
 
 /// Struct to represent a JSON query parameter for a given location
 #[derive(FromForm, Serialize, Deserialize)]
@@ -20,18 +20,26 @@ pub struct CoordinateList(pub Vec<(f64, f64)>);
 /// Implement FromStr for CoordinateList to parse the coordinate list from the request query
 impl FromStr for CoordinateList {
 
-    type Err = Utf8Error;  // TODO: This probably isn't the correct error here...
+    type Err = ParseFloatError;
 
-    // Take a list of tuples ie. (12.23,45.45),(23.3,34.5) and form into Vec<f64, f64)> data type
+    // Take a string list of tuples ie. "(12.23,45.45),(23.3,34.5)" and form into Vec<(f64, f64)> data type
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let points: Vec<&str> = s.split("(").filter(|v| v != &"").collect::<Vec<&str>>();
         let points: Vec<&str> = points.iter().map(|v| v.trim_matches(|v|v == ')' || v == ',')).collect();
-        let points: Vec<Vec<f64>> = points.iter()
-            .map(|v| v.split(",")
-                .map(|v| f64::from_str(v).expect("Failed to parse f64")).collect()
-            )
-            .collect();
-        let points: Vec<(f64, f64)> = points.iter().map(|v| (v[0], v[1])).collect();
+        let points: Vec<Vec<&str>> = points.iter().map(|v| v.split(",").collect()).collect();
+
+        let mut parsed_points: Vec<Vec<f64>> = Vec::new();
+        for str_vec in points.iter() {
+            let mut parsed_vec = Vec::new();
+            for s in str_vec {
+                match f64::from_str(s) {
+                    Ok(parsed_float) => parsed_vec.push(parsed_float),
+                    Err(err) => return Err(err)
+                }
+            }
+            parsed_points.push(parsed_vec);
+        }
+        let points: Vec<(f64, f64)> = parsed_points.iter().map(|v| (v[0], v[1])).collect();
         Ok(CoordinateList(points))
     }
 }
@@ -50,10 +58,3 @@ impl<'v> request::FromFormValue<'v> for CoordinateList {
     }
 }
 
-
-/// Enum to return
-#[derive(Serialize)]
-pub enum Message {
-    Success {message: Vec<elevation::Elevation>},
-    Error {message: String}
-}
