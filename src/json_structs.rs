@@ -24,11 +24,18 @@ impl FromStr for CoordinateList {
 
     // Take a string list of tuples ie. "(12.23,45.45),(23.3,34.5)" and form into Vec<(f64, f64)> data type
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let points: Vec<&str> = s.split("(").filter(|v| v != &"").collect::<Vec<&str>>();
-        let points: Vec<&str> = points.iter().map(|v| v.trim_matches(|v|v == ')' || v == ',')).collect();
-        let points: Vec<Vec<&str>> = points.iter().map(|v| v.split(",").collect()).collect();
+        /*
+            Create a vector of (f64, f64) from a string like "(1.2,3.4),(3.4,2.9)(1.2,3.4)" which
+            represents array of lat,lon coordinates.
+        */
+        let points: Vec<Vec<&str>> = s.split("(").filter(|v| v != &"") // Split (1.2,3.4)(1.3,2.3) into  ["1.2,3.4)", "1.3,2.3)"] less any empty strings
+            .map(|v| v.trim_matches(|v|v == ')' || v == ','))    // trim matches of ")" or "," resulting in [["1.2,3.4"], ["1.3,2.3"]]
+            .map(|v| v.split(",").collect())                               // map each tuple into [["1.2","3.4"], ["1.3", "2.3"]]
+            .collect();
 
-        let mut parsed_points: Vec<Vec<f64>> = Vec::new();
+        // Go over each sub vec and for each element in the subvec, parse into f64
+        // Return parse error if failed.
+        let mut parsed_points: Vec<(f64, f64)> = Vec::new();
         for str_vec in points.iter() {
             let mut parsed_vec = Vec::new();
             for s in str_vec {
@@ -37,10 +44,10 @@ impl FromStr for CoordinateList {
                     Err(err) => return Err(err)
                 }
             }
-            parsed_points.push(parsed_vec);
+            parsed_points.push((parsed_vec[0], parsed_vec[1]));
         }
-        let points: Vec<(f64, f64)> = parsed_points.iter().map(|v| (v[0], v[1])).collect();
-        Ok(CoordinateList(points))
+
+        Ok(CoordinateList(parsed_points))
     }
 }
 
