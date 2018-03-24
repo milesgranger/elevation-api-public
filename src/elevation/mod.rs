@@ -118,6 +118,11 @@ pub struct Elevation {
     pub elevation: f64
 }
 
+#[derive(Serialize)]
+pub struct ElevationResponse {
+    pub points: Vec<Elevation>
+}
+
 /// Load a created summary.json file; holds information about what coordiantes belong to which file
 pub fn load_summary_file() -> Vec<ElevationTileFileMetaData> {
     let file = File::open("./data/summary.json").expect("Failed to open file.");

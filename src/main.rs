@@ -40,14 +40,15 @@ fn static_files(file: PathBuf) -> Option<NamedFile> {
 
 
 // Main API for 90m resolution
-#[get("/api/elevations/90m?<points>")]
-fn get_elevations(points: Option<Points>) -> Result<Json<Vec<elevation::Elevation>>, BadRequest<String>> {
+#[get("/api/v1.0.0/90m?<points>")]
+fn get_elevations(points: Option<Points>) -> Result<Json<elevation::ElevationResponse>, BadRequest<String>> {
 
     match points {
         Some(points) => {
             let metas = elevation::load_summary_file();
             let elevations = elevation::get_elevations(points.points.0, &metas);
-            Ok(Json(elevations))
+            let elevation_response = elevation::ElevationResponse{points: elevations};
+            Ok(Json(elevation_response))
         },
         None => {
             Err(BadRequest(Some("Unable to parse coordinates. Should be in form '(lat, lon),(lat,lon),(lat,lon)'".to_string())))
