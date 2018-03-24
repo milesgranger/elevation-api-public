@@ -12,4 +12,4 @@ serde = "1.0.29"
 serde_derive = "1.0.29"
 rocket = "0.3.6"
 rocket_codegen = "0.3.6"
-rocket_contrib = {features = ["json"], version = "*", default-features = false}
+rocket_contrib = {features = ["json", "tera_templates"], version = "*", default-features = false}

@@ -9,9 +9,12 @@ pub extern crate serde;
 pub extern crate serde_json;
 #[macro_use] pub extern crate serde_derive;
 
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 use glob::glob;
-use rocket_contrib::Json;
+use rocket_contrib::{Json, Template};
 use rocket::response::status::BadRequest;
+use rocket::response::NamedFile;
 
 // Local mods
 #[cfg(test)]
@@ -23,10 +26,17 @@ use json_structs::{Points};
 
 // Sanity check
 #[get("/")]
-fn index() -> &'static str {
-    "Up and running!"
+fn index() -> Template {
+    let mut context = HashMap::new();
+    context.insert("title".to_string(), "Free Elevation API".to_string());
+    Template::render("index", &context)
 }
 
+
+#[get("/<file..>")]
+fn static_files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("static/").join(file)).ok()
+}
 
 
 // Main API for 90m resolution
@@ -49,7 +59,8 @@ fn get_elevations(points: Option<Points>) -> Result<Json<Vec<elevation::Elevatio
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, get_elevations])
+        .mount("/", routes![index, get_elevations, static_files])
+        .attach(Template::fairing())
         .launch();
 
 }
