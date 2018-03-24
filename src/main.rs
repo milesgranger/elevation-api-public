@@ -41,7 +41,7 @@ fn static_files(file: PathBuf) -> Option<NamedFile> {
 
 // Main API for 90m resolution
 #[get("/api/v1.0.0/90m?<points>")]
-fn get_elevations(points: Option<Points>) -> Result<Json<elevation::ElevationResponse>, BadRequest<String>> {
+fn get_elevations_v1_0_0(points: Option<Points>) -> Result<Json<elevation::ElevationResponse>, BadRequest<String>> {
 
     match points {
         Some(points) => {
@@ -60,7 +60,7 @@ fn get_elevations(points: Option<Points>) -> Result<Json<elevation::ElevationRes
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, get_elevations, static_files])
+        .mount("/", routes![index, get_elevations_v1_0_0, static_files])
         .attach(Template::fairing())
         .launch();
 
