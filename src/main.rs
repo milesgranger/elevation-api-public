@@ -23,12 +23,18 @@ mod elevation;
 mod json_structs;
 use json_structs::{Points};
 
+fn take_me(n: &String) {
+    println!("{}", n);
+}
+
 
 // Sanity check
 #[get("/")]
 fn index() -> Template {
     let mut context = HashMap::new();
     context.insert("title".to_string(), "Free Elevation API".to_string());
+
+
     Template::render("index", &context)
 }
 

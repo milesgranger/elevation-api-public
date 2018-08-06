@@ -1,8 +1,8 @@
 use std::f64;
-use std::path::Path;
-use std::collections::HashMap;
 use std::fs::File;
+use std::path::Path;
 use std::io::prelude::*;
+use std::collections::HashMap;
 
 use netcdf;
 use ndarray::ArrayD;
@@ -83,6 +83,7 @@ impl ElevationTile {
         */
         let mut min = f64::MAX;
         let mut min_index: usize = 0;
+
         for (i, val) in array.iter().enumerate() {
             if (f - val).abs() < min {
                 min = (f - val).abs();
@@ -131,6 +132,7 @@ pub fn load_summary_file() -> Vec<ElevationTileFileMetaData> {
 }
 
 /// Create summary.json file; holds information about what coordinates belong to which file
+#[allow(dead_code)]
 pub fn make_summary_file() {
     /*
         Create a summary json file which holds the meta data around each file.
