@@ -6,7 +6,8 @@
 **/*.rs.bk
 data/
 .idea/
-#raw_download_tiffs/
-#processed_netcdf_files/
+*.tif
+*.nc.gz
+*.nc
 venv/
 __pycache__/
