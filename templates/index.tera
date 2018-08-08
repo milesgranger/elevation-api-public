@@ -158,18 +158,25 @@
                             <div class="col-md-12">
                                 <p>
                                     Simple to use, make a query with a list of tuples representing latitude and longitudes.
+                                    <br>
+                                    <strong>**Currently, during beta, we can only offer 1km accuracy.**</strong>
                                 </p>
 
                                 <h4>Example:</h4>
                                     <code>
-                                        curl 'https://elevation-freebee/api/v1.0.0/90m?points=(48.35,5.3),(48.35,5.23)'
+                                        curl http://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)
                                     </code>
                                     <p>
                                         Results in:
                                     </p>
-                                    <samp>
-                                        {"points":[{"lat":48.35,"lon":5.3,"elevation":352.0},{"lat":48.35,"lon":5.23,"elevation":314.0}]}
-                                    </samp>
+                                    <code>
+                                        {
+                                            'points': [
+                                                {'elevation': 2606.0, 'lat': 39.90974, 'lon': -106.17188},
+                                                {'elevation': 1060.0, 'lat': 62.52417, 'lon': 10.02487}
+                                            ]
+                                        }
+                                    </code>
                                 <p>
                                     <i>That's it!</i>
                                 </p>

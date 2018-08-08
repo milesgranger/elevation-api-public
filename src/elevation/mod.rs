@@ -1,3 +1,4 @@
+use std::env;
 use std::f64;
 use std::fs::File;
 use std::path::Path;
@@ -58,11 +59,24 @@ impl ElevationTile {
     fn new(path: &Path) -> ElevationTile {
         // Create a new elevation resource
 
-        let file = netcdf::open(path.to_str().unwrap()).unwrap();
+        let file = netcdf::open(path.to_str().expect("Can't convert to str!")).expect("Unable to open file for NetCDF format!");
 
+        info!("Variables: {:?}", &file.root.variables.keys());
 
-        let lats: ArrayD<f64> = file.root.variables.get("lat").unwrap().as_array().unwrap();
-        let lons: ArrayD<f64> = file.root.variables.get("lon").unwrap().as_array().unwrap();
+        let lat_key = if file.root.variables.contains_key("y") { "y" } else { "lat" };
+        let lon_key = if file.root.variables.contains_key("x") { "x" } else { "lon" };
+
+        let lats: ArrayD<f64> = file.root.variables
+            .get(lat_key)
+            .expect(&format!("No variable called {}", lat_key))
+            .as_array()
+            .unwrap();
+        let lons: ArrayD<f64> = file.root.variables
+            .get(lon_key)
+            .expect(&format!("No variable called {}", lon_key))
+            .as_array()
+            .unwrap();
+
         let data = file.root.variables.get("Band1").unwrap().as_array().unwrap();
 
         let lat_min_max = (lats.min_value(), lats.max_value());
@@ -127,14 +141,18 @@ pub struct ElevationResponse {
 
 /// Load a created summary.json file; holds information about what coordiantes belong to which file
 pub fn load_summary_file() -> Vec<ElevationTileFileMetaData> {
-    let file = File::open("./data/summary.json").expect("Failed to open file.");
+    let summary_file_loc = env::var("SUMMARY_FILE_PATH")
+        .unwrap_or_else(|_| {
+            panic!("Need to set SUMMARY_FILE_PATH env variable!")
+        });
+    let file = File::open(summary_file_loc).expect("Failed to open file.");
     let data: Vec<ElevationTileFileMetaData> = serde_json::from_reader(file).unwrap();
     data
 }
 
 /// Create summary.json file; holds information about what coordinates belong to which file
 #[allow(dead_code)]
-pub fn make_summary_file() {
+pub fn make_summary_file(source_path: &str) {
     /*
         Create a summary json file which holds the meta data around each file.
         Query this file of {"file": "file/path.nc", "coords": [lat_min, lat_max, lon_min, _lon_max]}
@@ -145,7 +163,7 @@ pub fn make_summary_file() {
     let mut file_data: Vec<ElevationTileFileMetaData> = Vec::new();
 
     // Loop through all netCDF files creating meta-data items for each one.
-    for entry in glob("/home/milesg/Projects/elevation-api/processed_netcdf_files/*.nc.gz")
+    for entry in glob(&format!("{}/*.nc", &source_path))
         .expect("Can't read glob pattern")
         {
             match entry {
@@ -154,7 +172,7 @@ pub fn make_summary_file() {
 
                     let elevation = ElevationTile::new(&path);
 
-                    let file = path.into_os_string().into_string().unwrap();
+                    let file = path.into_os_string().into_string().expect("Unable to place into path");
                     let coords = [
                             elevation.lat_min_max.0, elevation.lat_min_max.1,
                             elevation.lon_min_max.0, elevation.lon_min_max.1
@@ -168,9 +186,11 @@ pub fn make_summary_file() {
     }
 
     // Serialize list of meta-data items into JSON string and dump to file.
-    let data = serde_json::to_string(&file_data).unwrap();
+    let data = serde_json::to_string(&file_data)
+        .expect("Unable to serialize vector of meta data");
 
-    let mut summary = File::create("/home/milesg/Projects/elevation-api/data/summary.json").unwrap();
+    let mut summary = File::create(&format!("{}/summary.json", &source_path))
+        .expect("Unable to write data to summary file!");
     let result = summary.write_all(&data.into_bytes());
     match result {
         Ok(_r) => println!("Wrote out summary file successfully!"),
@@ -183,10 +203,11 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
     /*
         Fetch elevations for the given coordinates.
     */
+    println!("Got these coordinates: {:?}", &coords);
     let mut tiles: HashMap<&String, ElevationTile> = HashMap::new();
     let mut elevations: Vec<Elevation> = Vec::new();
 
-    for &(ref lat, ref lon) in coords.iter() {
+    for (lat, lon) in coords.iter() {
         for resource in metas.iter() {
             // Resource has coordinates holding both these lat and lon coords
             if (lat >= &resource.coords[0] && lat <= &resource.coords[1]) &&
@@ -209,8 +230,12 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
                 // Create an elevation and insert it into the result vector.
                 let result = Elevation {lat: *lat, lon: *lon, elevation};
                 elevations.push(result);
+
+                // Elevation added, no need to continue trying other resources
+                break;
             }
         }
     }
+    println!("Got these elevations: {:?}", elevations.iter().map(|elev| elev.elevation).collect::<Vec<f64>>());
     elevations
 }
