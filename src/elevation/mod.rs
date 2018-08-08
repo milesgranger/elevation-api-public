@@ -60,6 +60,7 @@ impl ElevationTile {
 
         let file = netcdf::open(path.to_str().unwrap()).unwrap();
 
+
         let lats: ArrayD<f64> = file.root.variables.get("lat").unwrap().as_array().unwrap();
         let lons: ArrayD<f64> = file.root.variables.get("lon").unwrap().as_array().unwrap();
         let data = file.root.variables.get("Band1").unwrap().as_array().unwrap();
@@ -144,7 +145,7 @@ pub fn make_summary_file() {
     let mut file_data: Vec<ElevationTileFileMetaData> = Vec::new();
 
     // Loop through all netCDF files creating meta-data items for each one.
-    for entry in glob("/home/milesg/Projects/elevation-api/data/*.nc")
+    for entry in glob("/home/milesg/Projects/elevation-api/processed_netcdf_files/*.nc.gz")
         .expect("Can't read glob pattern")
         {
             match entry {

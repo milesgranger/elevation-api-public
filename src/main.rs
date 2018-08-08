@@ -8,6 +8,8 @@ pub extern crate glob;
 pub extern crate serde;
 pub extern crate serde_json;
 #[macro_use] pub extern crate serde_derive;
+#[macro_use] extern crate log;
+extern crate env_logger;
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -22,10 +24,6 @@ mod tests;
 mod elevation;
 mod json_structs;
 use json_structs::{Points};
-
-fn take_me(n: &String) {
-    println!("{}", n);
-}
 
 
 // Sanity check
@@ -65,6 +63,11 @@ fn get_elevations_v1_0_0(points: Option<Points>) -> Result<Json<elevation::Eleva
 
 
 fn main() {
+
+    env_logger::init();
+
+    info!("Starting up!");
+
     rocket::ignite()
         .mount("/", routes![index, get_elevations_v1_0_0, static_files])
         .attach(Template::fairing())

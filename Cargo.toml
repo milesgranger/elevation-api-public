@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["Miles Granger <miles59923@gmail.com>"]
 
 [dependencies]
+log = "0.4.0"
+env_logger = "0.5.12"
 ndarray = "0.11.1"
 netcdf = {git = "https://github.com/mhiley/rust-netcdf.git"}
 glob = "0.2.11"
