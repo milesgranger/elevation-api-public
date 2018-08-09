@@ -1,0 +1,16 @@
+FROM debian:jessie-slim
+
+RUN apt update && apt install -y \
+    libnetcdf-dev \
+    curl \
+    gcc \
+    g++
+
+# Install rust nightly
+RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
+RUN bash -c "source $HOME/.cargo/env"
+ENV PATH=$HOME/.cargo/bin:$PATH
+
+WORKDIR /build
+
+CMD $HOME/.cargo/bin/cargo build --release

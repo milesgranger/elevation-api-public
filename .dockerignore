@@ -1,0 +1,4 @@
+processed_netcdf_files/
+raw_download_tiffs/
+venv/
+.idea/

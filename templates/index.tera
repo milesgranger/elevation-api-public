@@ -115,8 +115,8 @@
 
                                             <p>
                                                 <i>
-                                                    Elevations are given by the SRTM90 (90 meter) resolution dataset between the -60 and 60 latitudes.
-                                                    In the future we aim to have the SRTM30 (30 meter) resolution supported.
+                                                    Elevations are presently only available at a 1km resolution, until I know
+                                                    people will actually use this service. ;)
                                                 </i>
                                             </p>
 

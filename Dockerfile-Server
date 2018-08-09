@@ -1,0 +1,15 @@
+FROM debian:jessie-slim
+
+RUN apt update && apt install -y \
+    libnetcdf-dev
+
+RUN mkdir /data
+WORKDIR /server
+COPY ./target/release/elevation-api /server
+COPY static/ /server/static/
+COPY templates/ /server/templates/
+RUN chmod +x /server/elevation-api
+
+ENV ROCKET_ADDRESS "0.0.0.0"
+
+CMD /server/elevation-api make-summary /data && /server/elevation-api run-server /data/summary.json

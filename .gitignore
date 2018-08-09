@@ -7,7 +7,9 @@
 data/
 .idea/
 *.tif
+summary.json
 *.nc.gz
 *.nc
 venv/
+build/
 __pycache__/
