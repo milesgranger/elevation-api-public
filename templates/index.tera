@@ -107,10 +107,9 @@
 
                                         <div>
                                             <p>
-                                                Welcome to a free service to get elevation data (between -60 and 60 latitudes)!
+                                                Welcome to a free service to get elevation data!
                                                 This service is free and will remain that way, however please consider
-                                                making a donation for its worth to you. :) And feel free to request additional
-                                                features/coverage.
+                                                making a donation for its worth to you. :)
                                             </p>
 
                                             <p>
@@ -158,8 +157,6 @@
                             <div class="col-md-12">
                                 <p>
                                     Simple to use, make a query with a list of tuples representing latitude and longitudes.
-                                    <br>
-                                    <strong>**Currently, during beta, we can only offer 1km accuracy.**</strong>
                                 </p>
 
                                 <h4>Example:</h4>

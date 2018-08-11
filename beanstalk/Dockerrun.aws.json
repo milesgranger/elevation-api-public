@@ -1,0 +1,19 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "milesg/elevation-api-server:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "8000"
+    }
+  ],
+  "Volumes": [
+    {
+      "HostDirectory": "/efs/gt30",
+      "ContainerDirectory": "/data"
+    }
+  ],
+  "Logging": "/var/log/nginx"
+}

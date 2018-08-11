@@ -7,6 +7,7 @@
 data/
 .idea/
 *.tif
+*.zip
 summary.json
 *.nc.gz
 *.nc
