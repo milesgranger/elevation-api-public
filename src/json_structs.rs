@@ -1,11 +1,9 @@
 use std::str::FromStr;
 use std::num::ParseFloatError;
-use rocket::request;
-use rocket::http;
 
 
 /// Struct to represent a JSON query parameter for a given location
-#[derive(FromForm, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Points {
     pub points: CoordinateList
 }
@@ -50,18 +48,3 @@ impl FromStr for CoordinateList {
         Ok(CoordinateList(parsed_points))
     }
 }
-
-
-/// Implement for Rocket to parse the value from the request, which will implicitly invoke the
-/// FromStr impl above.
-impl<'v> request::FromFormValue<'v> for CoordinateList {
-    type Error = &'v http::RawStr;
-
-    fn from_form_value(form_value: &'v http::RawStr) -> Result<CoordinateList, &'v http::RawStr> {
-        match form_value.parse::<CoordinateList>() {
-            Ok(points) => Ok(points),
-            _ => Err(form_value)
-        }
-    }
-}
-
