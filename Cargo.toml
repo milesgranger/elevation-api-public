@@ -4,15 +4,15 @@ version = "0.1.0"
 authors = ["Miles Granger <miles59923@gmail.com>"]
 
 [dependencies]
-log = "0.4.0"
-clap = "2.32.0"
-env_logger = "0.5.12"
-ndarray = "0.11.1"
+log = "0.4"
+clap = "2.32"
+env_logger = "0.5"
+ndarray = "0.11"
 netcdf = {git = "https://github.com/mhiley/rust-netcdf.git"}
-glob = "0.2.11"
-serde_json = "1.0.11"
-serde = "1.0.29"
-serde_derive = "1.0.29"
+glob = "0.2"
+serde_json = "1.0"
+serde = "1.0"
+serde_derive = "1.0"
 actix-web = "0.7"
 actix = "0.7"
 tera = "0.11"

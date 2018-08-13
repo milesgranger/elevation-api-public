@@ -135,7 +135,7 @@ pub struct Elevation {
 }
 
 #[derive(Serialize)]
-pub struct ElevationResponse {
+pub struct Elevations {
     pub points: Vec<Elevation>
 }
 

@@ -1,25 +1,26 @@
 #[macro_use] pub extern crate serde_derive;
-#[macro_use] extern crate log;
+#[macro_use] pub extern crate log;
 pub extern crate netcdf;
 pub extern crate ndarray;
 pub extern crate glob;
 pub extern crate serde;
 pub extern crate serde_json;
-extern crate env_logger;
+pub extern crate actix_web;
+pub extern crate env_logger;
 extern crate clap;
 extern crate actix;
-extern crate actix_web;
 #[macro_use]
 extern crate tera;
 
 
 use actix_web::{
-    error, http, middleware, server, App, Error, HttpResponse, Query, State, fs
+    error, http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, Responder, State, fs, Json, Form, Result
 };
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::env;
+use std::str::FromStr;
 
 use clap::{Arg, App as ClapApp, SubCommand};
 use glob::glob;
@@ -33,12 +34,12 @@ mod json_structs;
 use json_structs::{Points};
 
 
-struct TeraAppState {
+struct AppState {
     template: tera::Tera,
 }
 
 // Sanity check
-fn index((state, query): (State<TeraAppState>, Query<HashMap<String, String>>)) -> Result<HttpResponse, Error> {
+fn index((state, query): (State<AppState>, Query<HashMap<String, String>>)) -> Result<HttpResponse, Error> {
     let mut context = HashMap::new();
     context.insert("title".to_string(), "Free Elevation API".to_string());
 
@@ -52,27 +53,25 @@ fn index((state, query): (State<TeraAppState>, Query<HashMap<String, String>>)) 
 }
 
 // Main API for 90m resolution
-fn get_elevations(points: Option<Points>) -> () //Result<Json<elevation::ElevationResponse>, BadRequest<String>>
-{
+fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
 
-    match points {
-        Some(points) => {
-            let metas = elevation::load_summary_file();
-            let elevations = elevation::get_elevations(points.points.0, &metas);
+    let points_str = req.query().get("points").unwrap().to_owned();
+    info!("Got the points string!");
+    let metas = elevation::load_summary_file();
+    let points = Points::from_str(&points_str).expect("Unable to parse points!");
 
-            let elevation_response = elevation::ElevationResponse{points: elevations};
-            //Ok(Json(elevation_response))
-        },
-        None => {
-            println!("None!");
-            //Err(BadRequest(Some("Unable to parse coordinates. Should be in form '(lat,lon),(lat,lon),(lat,lon)'".to_string())))
-        }
-    };
+    let elevations = elevation::get_elevations(points.points, &metas);
+
+    Json(elevations)
+
 
 }
 
 
 fn main() {
+
+    env::set_var("RUST_LOG", "actix_web=debug");
+    //env::set_var("RUST_BACKTRACE", "1");
 
     env_logger::init();
     info!("Starting up!");
@@ -110,15 +109,24 @@ fn main() {
         elevation::make_summary_file(path);
 
     } else if let Some(m) = matches.subcommand_matches("run-server") {
+
         let summary_file = m.value_of("SUMMARY-FILE").expect("No path specified!");
+
         env::set_var("SUMMARY_FILE_PATH", summary_file);
 
         // Server
         let sys = actix::System::new("elevation-api");
 
         server::new(|| {
+
                 let tera = compile_templates!(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*"));
-                App::with_state(TeraAppState{template: tera})
+
+                App::with_state(AppState {template: tera})
+
+                    // Logging
+                    .middleware(middleware::Logger::default())
+
+                    // Application base route
                     .prefix("/")
 
                     // Static files
@@ -127,7 +135,12 @@ fn main() {
                         fs::StaticFiles::new("static")
                             .expect("Can't find static directory!")
                             .show_files_listing())
+
+                    // Homepage
                     .resource("/", |r| r.method(http::Method::GET).with(index))
+
+                    // Main elevation API
+                    .resource("/api/elevation", |r| r.method(http::Method::GET).f(get_elevations))
             })
             .bind("0.0.0.0:8000")
             .expect("Unable to bind to 0.0.0.0:8000")

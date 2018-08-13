@@ -108,8 +108,10 @@
                                         <div>
                                             <p>
                                                 Welcome to a free service to get elevation data!
-                                                This service is free and will remain that way, however please consider
-                                                making a donation for its worth to you. :)
+                                                This service is free and will (try to) remain that way,
+
+                                                <strong>however</strong> please consider
+                                                making a donation for what it's worth to you. :)
                                             </p>
 
                                             <p>
@@ -167,12 +169,10 @@
                                         Results in:
                                     </p>
                                     <code>
-                                        {
-                                            'points': [
-                                                {'elevation': 2606.0, 'lat': 39.90974, 'lon': -106.17188},
-                                                {'elevation': 1060.0, 'lat': 62.52417, 'lon': 10.02487}
-                                            ]
-                                        }
+                                        [
+                                            {'elevation': 2606.0, 'lat': 39.90974, 'lon': -106.17188},
+                                            {'elevation': 1060.0, 'lat': 62.52417, 'lon': 10.02487}
+                                        ]
                                     </code>
                                 <p>
                                     <i>That's it!</i>
@@ -207,19 +207,14 @@
 
                                 <pre class="brush: html">
 
-                                        -----------------------------------------------------------------------------------------
-                                        Version 1.0.0 March 25th, 2018
-                                        -----------------------------------------------------------------------------------------
-
                                         - Public release with SRTM90 support
                                         - Only points between -60 and 60 latitudes supported.
-                                        - Example request: /api/v1.0.0/90m?points=(48.35,5.3),(48.35,5.23)
-                                          Response: {
-                                            "points": [
+                                        - Example request: /api/elevation?points=(48.35,5.3),(48.35,5.23)
+                                          Response: [
                                                 {"lat": 48.35, "lon": 5.3, "elevation": 352.0},
                                                 {"lat": 48.35, "lon": 5.23, "elevation": 314.0}
                                             ]
-                                          }
+
 
                                 </pre>
 

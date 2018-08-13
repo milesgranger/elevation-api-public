@@ -5,18 +5,13 @@ use std::num::ParseFloatError;
 /// Struct to represent a JSON query parameter for a given location
 #[derive(Serialize, Deserialize)]
 pub struct Points {
-    pub points: CoordinateList
+    pub points: Vec<(f64, f64)>
 }
 
 
-/// Struct to represent the core value of the Points struct
-/// list of tuples representing (lat, lon) values
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CoordinateList(pub Vec<(f64, f64)>);
-
 
 /// Implement FromStr for CoordinateList to parse the coordinate list from the request query
-impl FromStr for CoordinateList {
+impl FromStr for Points {
 
     type Err = ParseFloatError;
 
@@ -45,6 +40,6 @@ impl FromStr for CoordinateList {
             parsed_points.push((parsed_vec[0], parsed_vec[1]));
         }
 
-        Ok(CoordinateList(parsed_points))
+        Ok(Points { points: parsed_points })
     }
 }
