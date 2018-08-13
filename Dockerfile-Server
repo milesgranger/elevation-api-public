@@ -3,6 +3,9 @@ FROM debian:jessie-slim
 RUN apt update && apt install -y \
     libnetcdf-dev
 
+# build passes --build-arg DONTCACHE=$(date) to keep the steps below from being cached
+ARG DONTCACHE=1
+
 RUN mkdir /data
 WORKDIR /server
 COPY ./target/release/elevation-api /server

@@ -90,7 +90,6 @@
                                 </ul>
                             </li>
                             #}
-                            <li><a href="#line2">Version History (Changelog)</a></li>
                             <li><a href="#line3">Copyright</a></li>
                         </ul>
                     </nav >
@@ -117,7 +116,7 @@
                                             <p>
                                                 <i>
                                                     Elevations are presently only available at a 1km resolution, until I know
-                                                    people will actually use this service. ;)
+                                                    people will actually use this service.
                                                 </i>
                                             </p>
 
@@ -168,59 +167,22 @@
                                     <p>
                                         Results in:
                                     </p>
-                                    <code>
-                                        [
-                                            {'elevation': 2606.0, 'lat': 39.90974, 'lon': -106.17188},
-                                            {'elevation': 1060.0, 'lat': 62.52417, 'lon': 10.02487}
-                                        ]
-                                    </code>
+                                    <pre>
+<code>
+    {
+        "elevations":
+            [
+                {"lat":39.90974, "lon":-106.17188, "elevation":2606.0},
+                {"lat":62.52417, "lon":10.02487,   "elevation":1060.0}
+            ]
+    }
+</code>
+                                    </pre>
                                 <p>
                                     <i>That's it!</i>
                                 </p>
                             </div>
                         </div>
-
-                    </section>
-                    <!-- end section -->
-
-                    <section id="line2" class="section">
-
-                        <div class="row">
-                            <div class="col-md-12 left-align">
-                                <h2 class="dark-text">Version History (Changelog) <a href="#top">#back to top</a><hr></h2>
-                            </div>
-                            <!-- end col -->
-                        </div>
-                        <!-- end row -->
-
-                        <div class="row">
-                            <div class="col-md-12">
-
-                                <p>
-                                    Version history in-case you want to use a previous version or want to reference a
-                                    version you are using.
-                                </p>
-                                <hr>
-                                <h4>
-                                    Changelog
-                                </h4>
-
-                                <pre class="brush: html">
-
-                                        - Public release with SRTM90 support
-                                        - Only points between -60 and 60 latitudes supported.
-                                        - Example request: /api/elevation?points=(48.35,5.3),(48.35,5.23)
-                                          Response: [
-                                                {"lat": 48.35, "lon": 5.3, "elevation": 352.0},
-                                                {"lat": 48.35, "lon": 5.23, "elevation": 314.0}
-                                            ]
-
-
-                                </pre>
-
-                            </div>
-                        </div>
-                        <!-- end row -->
 
                     </section>
                     <!-- end section -->
@@ -238,7 +200,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <p>
-                                    Copyright &copy; Miles Granger elevation-
+                                    Copyright &copy; Miles Granger - elevation-api.io
                                 </p>
                             </div>
                         </div>

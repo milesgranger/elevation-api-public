@@ -18,7 +18,6 @@ use actix_web::{
 };
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
 use std::env;
 use std::str::FromStr;
 
@@ -39,13 +38,13 @@ struct AppState {
 }
 
 // Sanity check
-fn index((state, query): (State<AppState>, Query<HashMap<String, String>>)) -> Result<HttpResponse, Error> {
+fn index((state, _query): (State<AppState>, Query<HashMap<String, String>>)) -> Result<HttpResponse, Error> {
     let mut context = HashMap::new();
     context.insert("title".to_string(), "Free Elevation API".to_string());
 
     let s = state
         .template
-        .render("index.tera.html", &context)
+        .render("index.html", &context)
         .unwrap();
 
     Ok(HttpResponse::Ok().content_type("text/html").body(s))
@@ -61,8 +60,9 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
     let points = Points::from_str(&points_str).expect("Unable to parse points!");
 
     let elevations = elevation::get_elevations(points.points, &metas);
+    let elevations_resp = elevation::Elevations{ elevations };
 
-    Json(elevations)
+    Json(elevations_resp)
 
 
 }
@@ -119,7 +119,7 @@ fn main() {
 
         server::new(|| {
 
-                let tera = compile_templates!(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*"));
+                let tera = compile_templates!("./templates/**/*");
 
                 App::with_state(AppState {template: tera})
 
@@ -144,7 +144,6 @@ fn main() {
             })
             .bind("0.0.0.0:8000")
             .expect("Unable to bind to 0.0.0.0:8000")
-            .workers(1)
             .start();
 
         info!("Started server running on 0.0.0.0:8000");
