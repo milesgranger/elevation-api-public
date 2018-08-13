@@ -135,8 +135,8 @@ pub struct Elevation {
 }
 
 #[derive(Serialize)]
-pub struct ElevationResponse {
-    pub points: Vec<Elevation>
+pub struct Elevations {
+    pub elevations: Vec<Elevation>
 }
 
 /// Load a created summary.json file; holds information about what coordiantes belong to which file

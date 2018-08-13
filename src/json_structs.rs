@@ -1,24 +1,17 @@
 use std::str::FromStr;
 use std::num::ParseFloatError;
-use rocket::request;
-use rocket::http;
 
 
 /// Struct to represent a JSON query parameter for a given location
-#[derive(FromForm, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Points {
-    pub points: CoordinateList
+    pub points: Vec<(f64, f64)>
 }
 
 
-/// Struct to represent the core value of the Points struct
-/// list of tuples representing (lat, lon) values
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CoordinateList(pub Vec<(f64, f64)>);
-
 
 /// Implement FromStr for CoordinateList to parse the coordinate list from the request query
-impl FromStr for CoordinateList {
+impl FromStr for Points {
 
     type Err = ParseFloatError;
 
@@ -47,21 +40,6 @@ impl FromStr for CoordinateList {
             parsed_points.push((parsed_vec[0], parsed_vec[1]));
         }
 
-        Ok(CoordinateList(parsed_points))
+        Ok(Points { points: parsed_points })
     }
 }
-
-
-/// Implement for Rocket to parse the value from the request, which will implicitly invoke the
-/// FromStr impl above.
-impl<'v> request::FromFormValue<'v> for CoordinateList {
-    type Error = &'v http::RawStr;
-
-    fn from_form_value(form_value: &'v http::RawStr) -> Result<CoordinateList, &'v http::RawStr> {
-        match form_value.parse::<CoordinateList>() {
-            Ok(points) => Ok(points),
-            _ => Err(form_value)
-        }
-    }
-}
-

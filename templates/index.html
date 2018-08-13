@@ -17,20 +17,20 @@
 
     <title>{{ title }}</title>
 
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon">
 
-    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="css/stroke.css">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="css/animate.css">
-    <link rel="stylesheet" type="text/css" href="css/prettyPhoto.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/fonts/font-awesome-4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/stroke.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/prettyPhoto.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 
-    <link rel="stylesheet" type="text/css" href="js/syntax-highlighter/styles/shCore.css" media="all">
-    <link rel="stylesheet" type="text/css" href="js/syntax-highlighter/styles/shThemeRDark.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/static/js/syntax-highlighter/styles/shCore.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/static/js/syntax-highlighter/styles/shThemeRDark.css" media="all">
 
     <!-- CUSTOM -->
-    <link rel="stylesheet" type="text/css" href="css/custom.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/custom.css">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -90,7 +90,6 @@
                                 </ul>
                             </li>
                             #}
-                            <li><a href="#line2">Version History (Changelog)</a></li>
                             <li><a href="#line3">Copyright</a></li>
                         </ul>
                     </nav >
@@ -108,14 +107,16 @@
                                         <div>
                                             <p>
                                                 Welcome to a free service to get elevation data!
-                                                This service is free and will remain that way, however please consider
-                                                making a donation for its worth to you. :)
+                                                This service is free and will (try to) remain that way,
+
+                                                <strong>however</strong> please consider
+                                                making a donation for what it's worth to you. :)
                                             </p>
 
                                             <p>
                                                 <i>
                                                     Elevations are presently only available at a 1km resolution, until I know
-                                                    people will actually use this service. ;)
+                                                    people will actually use this service.
                                                 </i>
                                             </p>
 
@@ -166,66 +167,22 @@
                                     <p>
                                         Results in:
                                     </p>
-                                    <code>
-                                        {
-                                            'points': [
-                                                {'elevation': 2606.0, 'lat': 39.90974, 'lon': -106.17188},
-                                                {'elevation': 1060.0, 'lat': 62.52417, 'lon': 10.02487}
-                                            ]
-                                        }
-                                    </code>
+                                    <pre>
+<code>
+    {
+        "elevations":
+            [
+                {"lat":39.90974, "lon":-106.17188, "elevation":2606.0},
+                {"lat":62.52417, "lon":10.02487,   "elevation":1060.0}
+            ]
+    }
+</code>
+                                    </pre>
                                 <p>
                                     <i>That's it!</i>
                                 </p>
                             </div>
                         </div>
-
-                    </section>
-                    <!-- end section -->
-
-                    <section id="line2" class="section">
-
-                        <div class="row">
-                            <div class="col-md-12 left-align">
-                                <h2 class="dark-text">Version History (Changelog) <a href="#top">#back to top</a><hr></h2>
-                            </div>
-                            <!-- end col -->
-                        </div>
-                        <!-- end row -->
-
-                        <div class="row">
-                            <div class="col-md-12">
-
-                                <p>
-                                    Version history in-case you want to use a previous version or want to reference a
-                                    version you are using.
-                                </p>
-                                <hr>
-                                <h4>
-                                    Changelog
-                                </h4>
-
-                                <pre class="brush: html">
-
-                                        -----------------------------------------------------------------------------------------
-                                        Version 1.0.0 March 25th, 2018
-                                        -----------------------------------------------------------------------------------------
-
-                                        - Public release with SRTM90 support
-                                        - Only points between -60 and 60 latitudes supported.
-                                        - Example request: /api/v1.0.0/90m?points=(48.35,5.3),(48.35,5.23)
-                                          Response: {
-                                            "points": [
-                                                {"lat": 48.35, "lon": 5.3, "elevation": 352.0},
-                                                {"lat": 48.35, "lon": 5.23, "elevation": 314.0}
-                                            ]
-                                          }
-
-                                </pre>
-
-                            </div>
-                        </div>
-                        <!-- end row -->
 
                     </section>
                     <!-- end section -->
@@ -243,7 +200,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <p>
-                                    Copyright &copy; Miles Granger elevation-
+                                    Copyright &copy; Miles Granger - elevation-api.io
                                 </p>
                             </div>
                         </div>
@@ -265,21 +222,21 @@
     </div>
     <!-- end wrapper -->
 
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/retina.js"></script>
-    <script src="js/jquery.fitvids.js"></script>
-    <script src="js/wow.js"></script>
-    <script src="js/jquery.prettyPhoto.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/retina.js"></script>
+    <script src="/static/js/jquery.fitvids.js"></script>
+    <script src="/static/js/wow.js"></script>
+    <script src="/static/js/jquery.prettyPhoto.js"></script>
 
     <!-- CUSTOM PLUGINS -->
-    <script src="js/custom.js"></script>
-    <script src="js/main.js"></script>
+    <script src="/static/js/custom.js"></script>
+    <script src="/static/js/main.js"></script>
 
-    <script src="js/syntax-highlighter/scripts/shCore.js"></script>
-    <script src="js/syntax-highlighter/scripts/shBrushXml.js"></script>
-    <script src="js/syntax-highlighter/scripts/shBrushCss.js"></script>
-    <script src="js/syntax-highlighter/scripts/shBrushJScript.js"></script>
+    <script src="/static/js/syntax-highlighter/scripts/shCore.js"></script>
+    <script src="/static/js/syntax-highlighter/scripts/shBrushXml.js"></script>
+    <script src="/static/js/syntax-highlighter/scripts/shBrushCss.js"></script>
+    <script src="/static/js/syntax-highlighter/scripts/shBrushJScript.js"></script>
 
 </body>
 

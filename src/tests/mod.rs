@@ -16,7 +16,7 @@ fn test_v1_0_0_query() {
           }
     */
     use self::super::get_elevations_v1_0_0;
-    use self::super::elevation::{ElevationResponse, Elevation};
+    use self::super::elevation::{Elevations, Elevation};
 
     // Parse a query into a points object
     let points = Points {
@@ -24,7 +24,7 @@ fn test_v1_0_0_query() {
     };
 
     // Get elevations from the function
-    let elevations: ElevationResponse = get_elevations_v1_0_0(Some(points)).ok().unwrap().0;
+    let elevations: Elevations = get_elevations_v1_0_0(Some(points)).ok().unwrap().0;
 
     // Ensure that the first element == 48.35 which guarantees the version promised format.
     let point: &Elevation = &elevations.points[0];
