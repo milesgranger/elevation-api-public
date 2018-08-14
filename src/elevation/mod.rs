@@ -208,6 +208,7 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
     let mut elevations: Vec<Elevation> = Vec::new();
 
     for (lat, lon) in coords.iter() {
+        let mut found: bool = false;
         for resource in metas.iter() {
             // Resource has coordinates holding both these lat and lon coords
             if (lat >= &resource.coords[0] && lat <= &resource.coords[1]) &&
@@ -230,10 +231,16 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
                 // Create an elevation and insert it into the result vector.
                 let result = Elevation {lat: *lat, lon: *lon, elevation};
                 elevations.push(result);
+                found = true;
 
                 // Elevation added, no need to continue trying other resources
                 break;
             }
+        }
+        if !found {
+            // Elevation wasn't found, probably an ocean location.
+            let result = Elevation {lat: *lat, lon: *lon, elevation: -9999_f64};
+            elevations.push(result);
         }
     }
     println!("Got these elevations: {:?}", elevations.iter().map(|elev| elev.elevation).collect::<Vec<f64>>());
