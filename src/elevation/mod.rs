@@ -203,7 +203,6 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
     /*
         Fetch elevations for the given coordinates.
     */
-    println!("Got these coordinates: {:?}", &coords);
     let mut tiles: HashMap<&String, ElevationTile> = HashMap::new();
     let mut elevations: Vec<Elevation> = Vec::new();
 
@@ -239,10 +238,10 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
         }
         if !found {
             // Elevation wasn't found, probably an ocean location.
+            warn!("Could not find elevation for points ({}, {})", &lat, &lon);
             let result = Elevation {lat: *lat, lon: *lon, elevation: -9999_f64};
             elevations.push(result);
         }
     }
-    println!("Got these elevations: {:?}", elevations.iter().map(|elev| elev.elevation).collect::<Vec<f64>>());
     elevations
 }

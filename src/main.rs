@@ -20,6 +20,7 @@ use actix_web::{
 use std::collections::HashMap;
 use std::env;
 use std::str::FromStr;
+use std::path::{Path, PathBuf};
 
 use clap::{Arg, App as ClapApp, SubCommand};
 use glob::glob;
@@ -81,38 +82,36 @@ fn main() {
         .author("Miles Granger")
         .about("Web service and utility for giving elevations for locations on earth")
         .subcommand(
-            SubCommand::with_name("make-summary")
-                .about("Look at available NetCDF files in the directory and write out summary.json")
-                .arg(
-                    Arg::with_name("PATH")
-                        .required(true)
-                        // TODO: Accept paths ending with "/"
-                        .help("Path to the folder containing NetCDF files, NOT ending with a slash")
-                        .takes_value(true)
-                )
-        )
-        .subcommand(
             SubCommand::with_name("run-server")
                 .about("Run the elevation server")
                 .arg(
-                    Arg::with_name("SUMMARY-FILE")
+                    Arg::with_name("DATA-DIR")
                         .required(true)
-                        .help("Full path location of the summary.json file")
+                        .help("Full path to directory containing netcdf files for elevations")
                         .takes_value(true)
                 )
         )
         .get_matches();
 
 
-    if let Some(m) = matches.subcommand_matches("make-summary") {
-        let path = m.value_of("PATH").expect("No path specified");
-        elevation::make_summary_file(path);
+    if let Some(m) = matches.subcommand_matches("run-server") {
+        let data_dir = m.value_of("DATA-DIR").expect("No data directory specified!");
 
-    } else if let Some(m) = matches.subcommand_matches("run-server") {
+        // check that the directory actually exists
+        if !Path::new(&data_dir).exists() {
+            panic!("Data directory '{}' does not exist!", &data_dir);
+        }
 
-        let summary_file = m.value_of("SUMMARY-FILE").expect("No path specified!");
+        // Check for summary.json, if not available in that directory, create it.
+        let mut summary_file_path: PathBuf = data_dir.into();
+        summary_file_path.push("summary.json");
+        if !summary_file_path.exists() {
+            info!("Summary file not found, creating it at {}", summary_file_path.to_str().unwrap());
+            elevation::make_summary_file(&data_dir)
+        }
 
-        env::set_var("SUMMARY_FILE_PATH", summary_file);
+        // Set env var for location of summary file
+        env::set_var("SUMMARY_FILE_PATH", summary_file_path);
 
         // Server
         let sys = actix::System::new("elevation-api");

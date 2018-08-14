@@ -15,4 +15,4 @@ RUN chmod +x /server/elevation-api
 
 ENV ROCKET_ADDRESS "0.0.0.0"
 
-CMD /server/elevation-api make-summary /data && /server/elevation-api run-server /data/summary.json
+CMD /server/elevation-api run-server /data/
