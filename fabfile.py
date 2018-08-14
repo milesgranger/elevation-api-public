@@ -1,14 +1,18 @@
 import os
+import sys
 import ast
-import zlib
+import zipfile
 import gzip
 import tempfile
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from glob import glob
-from fabric.api import local
+from fabric.api import local, task, hide
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
 
 
 def split_geotiff_file(source_file: str, destination_dir: str):
@@ -45,8 +49,8 @@ def compress(file_path: str, dest_dir):
         wb.write(rb.read())
     print(f'gzip {file_path} -> {dest}')
 
-
-def process():
+@task
+def process_tifs(source_dir: str):
     """
     Process TIF files into a bunch of smaller NetCDF files with an associated
     summary.json file which lists what coordinates each title consists of.
@@ -69,7 +73,7 @@ def process():
             destination_dir = os.path.join(os.path.dirname(__file__), 'processed_netcdf_files')
 
             # Convert each tif to netCDF format.
-            processed_tifs = glob(os.path.join('./raw_download_tiffs', '*.tif'))
+            processed_tifs = glob(os.path.join(source_dir, '*.tif'))
             print(f'Found {len(processed_tifs)} to process!')
             futures = {executor.submit(convert_tif_to_netcdf, tif, destination_dir): tif for tif in processed_tifs}
             for future in as_completed(futures):
@@ -83,3 +87,56 @@ def process():
             for future in as_completed(futures):
                 future.result()
             """
+
+def run_command(command):
+    with hide('output', 'running'):
+        return local(command)
+
+@task
+def process_zip_hgt(source_dir: str, destination_dir: str):
+    """
+    Process a folder full of zipped hgt files, given source_dir and destination_dir arguments
+    """
+
+    zipped_files = glob(os.path.join(source_dir, '*.zip'))
+    logger.info('Found {} files to process.'.format(len(zipped_files)))
+
+    for i, file in enumerate(zipped_files):
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with zipfile.ZipFile(file, 'r') as f:
+                f.extractall(tmp_dir)
+
+            subfiles = glob(os.path.join(tmp_dir, '*/*'))
+
+            # Might be one more zipped file inside this zip file
+            with tempfile.TemporaryDirectory() as _tmp_dir:
+
+                for subfile in filter(lambda f: f.lower().endswith('.zip'), subfiles):
+                    with zipfile.ZipFile(subfile, 'r') as f:
+                        f.extractall(_tmp_dir)
+                subfiles.extend([f for f in glob(os.path.join(_tmp_dir, '*/*')) if os.path.isfile(f)])
+                subfiles.extend([f for f in glob(os.path.join(_tmp_dir, '*')) if os.path.isfile(f)])
+                backup = subfiles
+                subfiles = [f for f in subfiles if f.lower().endswith('.hgt')]
+
+                if not subfiles and len(backup) > 0:
+                    raise RuntimeError('No subfiles in zipped file: "{}", original ones before filter: {}!'.format(file, backup))
+
+                # Convert to NetCDF files
+                futures = []
+                with ThreadPoolExecutor(8) as executor:
+                    for subfile in subfiles:
+                        new_name = os.path.basename(subfile).lower().replace('.hgt', '.nc')
+                        command = f'gdal_translate -of netCDF -co "FORMAT=NC4" {subfile} {os.path.join(destination_dir, new_name)}'
+                        future = executor.submit(run_command, command)
+                        futures.append(future)
+                for future in as_completed(futures):
+                    try:
+                        future.result()
+                    except Exception as e:
+                        logger.critical('Failed converting to NetCDF: {}'.format(e))
+                        raise e
+
+        sys.stdout.write('\r{:.4f}% finished.'.format(((i+1) / len(zipped_files)) * 100))
+

@@ -1,4 +1,4 @@
 processed_netcdf_files/
-raw_download_tiffs/
+gt30_raw/
 venv/
 .idea/
