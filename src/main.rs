@@ -1,20 +1,19 @@
 #[macro_use] pub extern crate serde_derive;
 #[macro_use] pub extern crate log;
+#[macro_use] pub extern crate serde_json;
+#[macro_use] extern crate tera;
 pub extern crate netcdf;
 pub extern crate ndarray;
 pub extern crate glob;
 pub extern crate serde;
-pub extern crate serde_json;
 pub extern crate actix_web;
 pub extern crate env_logger;
 extern crate clap;
 extern crate actix;
-#[macro_use]
-extern crate tera;
 
 
 use actix_web::{
-    http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, Responder, State, fs, Json, Result
+    http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, Responder, State, fs, Result
 };
 use std::collections::HashMap;
 use std::env;
@@ -54,17 +53,32 @@ fn index((state, _query): (State<AppState>, Query<HashMap<String, String>>)) -> 
 // Main API for 90m resolution
 fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
 
-    let points_str = req.query().get("points").unwrap().to_owned();
-    info!("Got the points string!");
+    let points_str = match req.query().get("points") {
+        Some(pt_str) => pt_str.to_owned(),
+        None => {
+            return HttpResponse::Ok()
+                    .json(
+                        json!({ 
+                            "message": "Please provide some coordinates! ie. http://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)"
+                            }))
+        }
+    };
     let metas = elevation::load_summary_file();
-    let points = Points::from_str(&points_str).expect("Unable to parse points!");
+    let points = Points::from_str(&points_str);
 
-    let elevations = elevation::get_elevations(points.points, &metas);
-    let elevations_resp = elevation::Elevations{ elevations };
+    match points {
+        Ok(pts) => {
+            let elevations = elevation::get_elevations(pts.points, &metas);
+            let elevations_resp = elevation::Elevations{ elevations };
 
-    Json(elevations_resp)
-
-
+            HttpResponse::Ok()
+                .json(elevations_resp)
+        },
+        Err(_) => {
+            HttpResponse::BadRequest()
+                .json(json!({"message": "Unable to parse one or more of the coordinates provided!"}))
+        }
+    }
 }
 
 
