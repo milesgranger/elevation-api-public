@@ -1,0 +1,23 @@
+sudo: required
+
+language: rust
+
+rust:
+  - stable
+
+matrix:
+  fast_finish: true
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get install -y libnetcdf-dev
+
+script:
+  - make test
+
+deploy:
+  provider: script
+  script: make deploy
+  
