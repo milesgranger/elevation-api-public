@@ -1,7 +1,7 @@
 
-WORKDIR	:= $(shell pwd)
+WORKDIR := $(shell pwd)
 DATE    := $(shell date +%s)
-VERSION := v1.0.11
+VERSION := v1.0.12
 
 test:
 	cargo test
@@ -35,4 +35,4 @@ sync-90m_files:
 	 $(WORKDIR)/90m_files/processed/ ec2-user@$(REMOTE-HOST):/home/ec2-user/efs/srtm90
 
 build-deploy:
-	cd beanstalk && zip -r deploy.zip . && cd ..
+	cd beanstalk && zip -r deploy-$(VERSION).zip . && cd ..

@@ -8,6 +8,12 @@ pub struct Points {
     pub points: Vec<(f64, f64)>
 }
 
+impl Points {
+    pub fn len(&self) -> usize {
+        self.points.len()
+    }
+}
+
 
 
 /// Implement FromStr for CoordinateList to parse the coordinate list from the request query

@@ -68,6 +68,12 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
 
     match points {
         Ok(pts) => {
+
+            if pts.len() > 50 {
+                return HttpResponse::BadRequest()
+                    .json(json!({"message": "Requested more than 50 locations, please reduce the request size."}))
+            }
+
             let elevations = elevation::get_elevations(pts.points, &metas);
             let elevations_resp = elevation::Elevations{ elevations };
 
