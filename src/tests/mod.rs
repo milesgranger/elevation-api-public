@@ -20,6 +20,6 @@ fn test_points() {
     let points = Points::from_str("(48.35,5.3),(48.43,5.23)").unwrap();
     assert_eq!(points.points[0].0, 48.35);
     assert_eq!(points.points[0].1, 5.3);
-    assert_eq!(points.points[0].0, 48.43);
-    assert_eq!(points.points[0].1, 5.23);
+    assert_eq!(points.points[1].0, 48.43);
+    assert_eq!(points.points[1].1, 5.23);
 }
