@@ -38,6 +38,17 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-68676935-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-68676935-2');
+    </script>
+
+
 </head>
 
 <body>
@@ -77,19 +88,6 @@
                             <li>
                                 <a href="#line1">Get Started</a>
                             </li>
-                            {#
-                            <li><a href="#line7">How to Use Option Panel</a>
-                                <ul class="nav">
-                                    <li><a href="#line7_1">General Options</a></li>
-                                    <li><a href="#line7_2">Style Options</a></li>
-                                    <li><a href="#line7_3">Header Options</a></li>
-                                    <li><a href="#line7_4">Font Options</a></li>
-                                    <li><a href="#line7_5">Slider Options</a></li>
-                                    <li><a href="#line7_6">Page Options</a></li>
-                                    <li><a href="#line7_7">Import & Export</a></li>
-                                </ul>
-                            </li>
-                            #}
                             <li><a href="#line3">Copyright</a></li>
                         </ul>
                     </nav >
@@ -115,8 +113,8 @@
 
                                             <p>
                                                 <i>
-                                                    Elevations are presently only available at a 1km resolution, until I know
-                                                    people will actually use this service.
+                                                    Elevations are available at 90m resolution, and any points not found or are otherwise 
+                                                    at sea level are reported as <em>-9999</em>
                                                 </i>
                                             </p>
 

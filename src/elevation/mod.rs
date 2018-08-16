@@ -1,7 +1,7 @@
 use std::env;
 use std::f64;
 use std::fs::File;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::io::prelude::*;
 use std::collections::HashMap;
 
@@ -59,7 +59,7 @@ impl ElevationTile {
     fn new(path: &Path) -> ElevationTile {
         // Create a new elevation resource
 
-        let file = netcdf::open(path.to_str().expect("Can't convert to str!")).expect("Unable to open file for NetCDF format!");
+        let file = netcdf::open(path.to_str().expect("Can't convert to str!")).expect(&format!("Unable to open file for NetCDF format! {:?}", path.to_str()));
 
         info!("Variables: {:?}", &file.root.variables.keys());
 
@@ -141,12 +141,27 @@ pub struct Elevations {
 
 /// Load a created summary.json file; holds information about what coordiantes belong to which file
 pub fn load_summary_file() -> Vec<ElevationTileFileMetaData> {
-    let summary_file_loc = env::var("SUMMARY_FILE_PATH")
+    let source_dir = env::var("DATA_DIR")
         .unwrap_or_else(|_| {
-            panic!("Need to set SUMMARY_FILE_PATH env variable!")
+            panic!("Need to set DATA_DIR env variable!")
         });
-    let file = File::open(summary_file_loc).expect("Failed to open file.");
+
+    let source_dir: PathBuf = source_dir.into();
+
+    let file = File::open(source_dir.join("summary.json")).expect("Failed to open file.");
     let data: Vec<ElevationTileFileMetaData> = serde_json::from_reader(file).unwrap();
+
+    // All files in summary.json are simply the filenames, modify the loaded meta data 'file' to point to the full path. 
+    // this is given our DATA_DIR env variable
+    let data: Vec<ElevationTileFileMetaData> = data.into_iter()
+        .map(|v| {
+            ElevationTileFileMetaData { 
+                file: source_dir.join(v.file).into_os_string().into_string().unwrap(),
+                coords: v.coords
+             }
+        })
+        .collect();
+
     data
 }
 
@@ -168,17 +183,18 @@ pub fn make_summary_file(source_path: &str) {
         {
             match entry {
                 Ok(path) => {
-                    println!("Path: {:?}", path.display());
+                    println!("Path: {:?}", &path.display());
 
                     let elevation = ElevationTile::new(&path);
-
-                    let file = path.into_os_string().into_string().expect("Unable to place into path");
                     let coords = [
                             elevation.lat_min_max.0, elevation.lat_min_max.1,
                             elevation.lon_min_max.0, elevation.lon_min_max.1
                     ];
 
-                    let meta_data = ElevationTileFileMetaData {file, coords};
+                    let meta_data = ElevationTileFileMetaData {
+                        file: path.file_name().expect("Unable to take filename!").to_os_string().into_string().unwrap(), 
+                        coords
+                        };
                     file_data.insert(0, meta_data);
                 }
                 Err(e) => println!("Error locating path: {:?}", e)
@@ -203,11 +219,11 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
     /*
         Fetch elevations for the given coordinates.
     */
-    println!("Got these coordinates: {:?}", &coords);
     let mut tiles: HashMap<&String, ElevationTile> = HashMap::new();
     let mut elevations: Vec<Elevation> = Vec::new();
 
     for (lat, lon) in coords.iter() {
+        let mut found: bool = false;
         for resource in metas.iter() {
             // Resource has coordinates holding both these lat and lon coords
             if (lat >= &resource.coords[0] && lat <= &resource.coords[1]) &&
@@ -230,12 +246,18 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
                 // Create an elevation and insert it into the result vector.
                 let result = Elevation {lat: *lat, lon: *lon, elevation};
                 elevations.push(result);
+                found = true;
 
                 // Elevation added, no need to continue trying other resources
                 break;
             }
         }
+        if !found {
+            // Elevation wasn't found, probably an ocean location.
+            warn!("Could not find elevation for points ({}, {})", &lat, &lon);
+            let result = Elevation {lat: *lat, lon: *lon, elevation: -9999_f64};
+            elevations.push(result);
+        }
     }
-    println!("Got these elevations: {:?}", elevations.iter().map(|elev| elev.elevation).collect::<Vec<f64>>());
     elevations
 }

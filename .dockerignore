@@ -1,4 +1,5 @@
-processed_netcdf_files/
-raw_download_tiffs/
+srtm90/
+gt30/
 venv/
 .idea/
+90m_files/
