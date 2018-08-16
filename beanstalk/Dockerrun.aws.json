@@ -11,7 +11,7 @@
   ],
   "Volumes": [
     {
-      "HostDirectory": "/efs/gt30",
+      "HostDirectory": "/efs/srtm90",
       "ContainerDirectory": "/data"
     }
   ],

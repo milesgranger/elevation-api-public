@@ -14,9 +14,8 @@ extern crate tera;
 
 
 use actix_web::{
-    error, http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, Responder, State, fs, Json, Form, Result
+    http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, Responder, State, fs, Json, Result
 };
-
 use std::collections::HashMap;
 use std::env;
 use std::str::FromStr;
@@ -110,8 +109,8 @@ fn main() {
             elevation::make_summary_file(&data_dir)
         }
 
-        // Set env var for location of summary file
-        env::set_var("SUMMARY_FILE_PATH", summary_file_path);
+        // Set env var for location of data
+        env::set_var("DATA_DIR", &data_dir);
 
         // Server
         let sys = actix::System::new("elevation-api");
