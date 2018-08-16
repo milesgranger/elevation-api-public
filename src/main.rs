@@ -53,7 +53,16 @@ fn index((state, _query): (State<AppState>, Query<HashMap<String, String>>)) -> 
 // Main API for 90m resolution
 fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
 
-    let points_str = req.query().get("points").unwrap().to_owned();
+    let points_str = match req.query().get("points") {
+        Some(pt_str) => pt_str.to_owned(),
+        None => {
+            return HttpResponse::Ok()
+                    .json(
+                        json!({ 
+                            "message": "Please provide some coordinates! ie. http://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)"
+                            }))
+        }
+    };
     let metas = elevation::load_summary_file();
     let points = Points::from_str(&points_str);
 
@@ -63,11 +72,11 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
             let elevations_resp = elevation::Elevations{ elevations };
 
             HttpResponse::Ok()
-            .json(elevations_resp)
+                .json(elevations_resp)
         },
         Err(_) => {
             HttpResponse::BadRequest()
-            .json(json!({"message": "Unable to parse one or more of the coordinates provided!"}))
+                .json(json!({"message": "Unable to parse one or more of the coordinates provided!"}))
         }
     }
 }
