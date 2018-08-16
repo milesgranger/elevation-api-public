@@ -17,7 +17,7 @@ before_install:
 script:
   - make test
 
-deploy:
-  provider: script
-  script: make deploy
+#deploy:
+#  provider: script
+#  script: make build-images && make deploy
   
