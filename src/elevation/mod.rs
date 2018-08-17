@@ -119,22 +119,22 @@ impl ElevationTile {
 
 /// Struct to represent a specific NetCDF file containing meta data about what coordinates
 /// it holds information for and the file location.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ElevationTileFileMetaData {
-    file: String,       //
-    coords: [f64; 4]  // [min_lat, max_lat, min_lon, max_lon]
+    pub file: String,       //
+    pub coords: [f64; 4]  // [min_lat, max_lat, min_lon, max_lon]
 }
 
 
 /// Struct to represent a geographic point and its associated elevation.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Elevation {
     pub lat: f64,
     pub lon: f64,
     pub elevation: f64
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Elevations {
     pub elevations: Vec<Elevation>
 }

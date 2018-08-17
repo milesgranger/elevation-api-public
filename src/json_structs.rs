@@ -3,7 +3,7 @@ use std::num::ParseFloatError;
 
 
 /// Struct to represent a JSON query parameter for a given location
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Points {
     pub points: Vec<(f64, f64)>
 }
