@@ -17,3 +17,4 @@ venv/
 build/
 __pycache__/
 .vscode/
+!src/tests/data/n58e104.nc

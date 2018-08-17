@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "milesg/elevation-api-server:v1.0.12",
+    "Name": "milesg/elevation-api-server:v1.0.13",
     "Update": "true"
   },
   "Ports": [
