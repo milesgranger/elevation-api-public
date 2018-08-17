@@ -336,7 +336,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "elevation-api"
-version = "1.0.12"
+version = "1.0.13"
 dependencies = [
  "actix 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-web 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
