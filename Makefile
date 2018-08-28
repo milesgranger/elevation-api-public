@@ -1,3 +1,11 @@
+# Deploy steps:
+# 1. make test
+# 2. make build-images
+# 3. make start-docker-server -> test locally
+# 4. Update version HERE, Cargo.toml and in beanstalk/Dockerrun.aws.json
+# 5. make build-deploy && make deploy
+# 6. Test on staging
+# 7. Deploy on prodution
 
 WORKDIR := $(shell pwd)
 DATE    := $(shell date +%s)

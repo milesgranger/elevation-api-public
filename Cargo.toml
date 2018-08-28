@@ -4,6 +4,7 @@ version = "1.0.13"
 authors = ["Miles Granger <miles59923@gmail.com>"]
 
 [dependencies]
+lazy_static = "1.1.0"
 log = "0.4"
 clap = "2.32"
 env_logger = "0.5"
