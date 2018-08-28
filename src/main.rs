@@ -2,6 +2,7 @@
 #[macro_use] pub extern crate log;
 #[macro_use] pub extern crate serde_json;
 #[macro_use] extern crate tera;
+#[macro_use] extern crate lazy_static;
 pub extern crate netcdf;
 pub extern crate ndarray;
 pub extern crate glob;
@@ -30,6 +31,12 @@ mod tests;
 mod elevation;
 mod json_structs;
 use json_structs::{Points};
+use elevation::ElevationTileFileMetaData;
+
+
+lazy_static! {
+    static ref ELEVATION_METAS: Vec<ElevationTileFileMetaData> = elevation::load_summary_file();
+}
 
 
 struct AppState {
@@ -63,7 +70,7 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
                             }))
         }
     };
-    let metas = elevation::load_summary_file();
+
     let points = Points::from_str(&points_str);
 
     match points {
@@ -74,7 +81,7 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
                     .json(json!({"message": "Requested more than 50 locations, please reduce the request size."}))
             }
 
-            let elevations = elevation::get_elevations(pts.points, &metas);
+            let elevations = elevation::get_elevations(pts.points, &ELEVATION_METAS);
             let elevations_resp = elevation::Elevations{ elevations };
 
             HttpResponse::Ok()
