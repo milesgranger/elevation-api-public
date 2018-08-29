@@ -9,7 +9,7 @@
 
 WORKDIR := $(shell pwd)
 DATE    := $(shell date +%s)
-VERSION := v1.0.13
+VERSION := v1.0.14
 
 test:
 	cargo test

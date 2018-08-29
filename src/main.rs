@@ -92,7 +92,7 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
                     .json(json!({"message": "Requested more than 50 locations, please reduce the request size."}))
             }
 
-            let elevations = elevation::get_elevations(pts.points, &ELEVATION_METAS);
+            let elevations = elevation::get_elevations(&pts.points, &ELEVATION_METAS);
             let elevations_resp = elevation::Elevations{ elevations };
 
             info!("Successfully processed {} points in {}ms", n_points, start.elapsed().as_millis());

@@ -85,7 +85,7 @@ fn test_get_elevation() {
     let points = Points::from_str("(58.5,104.5)").unwrap();
 
     // Fetch elevation
-    let elevations = elevation::get_elevations(points.points, &metas);
+    let elevations = elevation::get_elevations(&points.points, &metas);
 
     assert_eq!(elevations[0].elevation, 457.0);
 
