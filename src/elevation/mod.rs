@@ -59,7 +59,9 @@ impl ElevationTile {
     fn new(path: &Path) -> ElevationTile {
         // Create a new elevation resource
 
-        let file = netcdf::open(path.to_str().expect("Can't convert to str!")).expect(&format!("Unable to open file for NetCDF format! {:?}", path.to_str()));
+        let file = netcdf::open(path.to_str()
+                    .expect("Can't convert to str!"))
+                    .unwrap_or_else(|_| panic!("Unable to open file for NetCDF format! {:?}", path.to_str()));
 
         info!("Variables: {:?}", &file.root.variables.keys());
 
@@ -68,16 +70,16 @@ impl ElevationTile {
 
         let lats: ArrayD<f64> = file.root.variables
             .get(lat_key)
-            .expect(&format!("No variable called {}", lat_key))
+            .unwrap_or_else(|| panic!("No variable called {}", lat_key))
             .as_array()
             .unwrap();
         let lons: ArrayD<f64> = file.root.variables
             .get(lon_key)
-            .expect(&format!("No variable called {}", lon_key))
+            .unwrap_or_else(|| panic!("No variable called {}", lon_key))
             .as_array()
             .unwrap();
 
-        let data = file.root.variables.get("Band1").unwrap().as_array().unwrap();
+        let data = file.root.variables["Band1"].as_array().unwrap();
 
         let lat_min_max = (lats.min_value(), lats.max_value());
         let lon_min_max = (lons.min_value(), lons.max_value());
@@ -91,7 +93,7 @@ impl ElevationTile {
         }
     }
 
-    fn find_closest_index(&self, array: &ArrayD<f64>, f: &f64) -> usize {
+    fn find_closest_index(&self, array: &ArrayD<f64>, f: f64) -> usize {
         /*
             Locate the index in "array" where the difference is smallest
             between that element and "f"
@@ -109,7 +111,7 @@ impl ElevationTile {
         min_index
     }
 
-    fn get_elevation(&self, lat: &f64, lon: &f64) -> f64 {
+    fn get_elevation(&self, lat: f64, lon: f64) -> f64 {
         let lat_index = self.find_closest_index(&self.lats, lat);
         let lon_index = self.find_closest_index(&self.lons, lon);
         self.data[[lat_index, lon_index]]
@@ -215,14 +217,14 @@ pub fn make_summary_file(source_path: &str) {
 }
 
 /// Function to grab elevations for a list of coordinates
-pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMetaData>) -> Vec<Elevation> {
+pub fn get_elevations(coords: &[(f64, f64)], metas: &[ElevationTileFileMetaData]) -> Vec<Elevation> {
     /*
         Fetch elevations for the given coordinates.
     */
     let mut tiles: HashMap<&String, ElevationTile> = HashMap::new();
     let mut elevations: Vec<Elevation> = Vec::new();
 
-    for (lat, lon) in coords.iter() {
+    for (lat, lon) in coords {
         let mut found: bool = false;
         for resource in metas.iter() {
             // Resource has coordinates holding both these lat and lon coords
@@ -233,13 +235,13 @@ pub fn get_elevations(coords: Vec<(f64, f64)>, metas: &Vec<ElevationTileFileMeta
 
                 // ElevationTile has been opened and resides in the tiles HashMap...
                 if tiles.contains_key(&resource.file) {
-                    let tile = tiles.get(&resource.file).unwrap();  // already checked, won't error
-                    elevation = tile.get_elevation(lat, lon);
+                    let tile = &tiles[&resource.file];
+                    elevation = tile.get_elevation(*lat, *lon);
 
                 // Create ElevationTile
                 } else {
                     let tile = ElevationTile::new(Path::new(&resource.file));
-                    elevation = tile.get_elevation(lat, lon);
+                    elevation = tile.get_elevation(*lat, *lon);
                     tiles.insert(&resource.file, tile);
                 }
 

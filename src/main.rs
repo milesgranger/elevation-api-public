@@ -1,3 +1,5 @@
+#![feature(duration_as_u128)]
+
 #[macro_use] pub extern crate serde_derive;
 #[macro_use] pub extern crate log;
 #[macro_use] pub extern crate serde_json;
@@ -20,6 +22,7 @@ use std::collections::HashMap;
 use std::env;
 use std::str::FromStr;
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 use clap::{Arg, App as ClapApp, SubCommand};
 use glob::glob;
@@ -45,6 +48,9 @@ struct AppState {
 
 // Sanity check
 fn index((state, _query): (State<AppState>, Query<HashMap<String, String>>)) -> Result<HttpResponse, Error> {
+
+    let start = Instant::now();
+
     let mut context = HashMap::new();
     context.insert("title".to_string(), "Free Elevation API".to_string());
 
@@ -52,13 +58,15 @@ fn index((state, _query): (State<AppState>, Query<HashMap<String, String>>)) -> 
         .template
         .render("index.html", &context)
         .unwrap();
-
+    info!("Handled request for homepage in {}ms", start.elapsed().as_millis());
     Ok(HttpResponse::Ok().content_type("text/html").body(s))
 
 }
 
 // Main API for 90m resolution
 fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
+
+    let start = Instant::now();
 
     let points_str = match req.query().get("points") {
         Some(pt_str) => pt_str.to_owned(),
@@ -76,14 +84,18 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
     match points {
         Ok(pts) => {
 
-            if pts.len() > 50 {
+            let n_points = pts.len();
+
+            if n_points > 50 {
+                warn!("Recieved API request for more than 50 points, got {}! Aborting request", pts.len());
                 return HttpResponse::BadRequest()
                     .json(json!({"message": "Requested more than 50 locations, please reduce the request size."}))
             }
 
-            let elevations = elevation::get_elevations(pts.points, &ELEVATION_METAS);
+            let elevations = elevation::get_elevations(&pts.points, &ELEVATION_METAS);
             let elevations_resp = elevation::Elevations{ elevations };
 
+            info!("Successfully processed {} points in {}ms", n_points, start.elapsed().as_millis());
             HttpResponse::Ok()
                 .json(elevations_resp)
         },
@@ -97,7 +109,7 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
 
 fn main() {
 
-    env::set_var("RUST_LOG", "actix_web=debug");
+    env::set_var("RUST_LOG", "actix_web,elevation_api=info");
     //env::set_var("RUST_BACKTRACE", "1");
 
     env_logger::init();
