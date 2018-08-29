@@ -19,7 +19,7 @@ run:
 
 build-images:
 	# Build the builder image, all tools needed to compile server
-	docker build . -t milesg/elevation-api-builder:latest --file ./Dockerfile-Builder
+	docker build . -t milesg/elevation-api-builder:latest --file ./Dockerfile-Builder --build-arg DONTCACHE=$(DATE)
 
 	# Run it on current code base, will deposit the executable into $(pwd)/target/release
 	docker run --rm -v $(WORKDIR):/build/ milesg/elevation-api-builder:latest
@@ -43,4 +43,4 @@ sync-90m_files:
 	 $(WORKDIR)/90m_files/processed/ ec2-user@$(REMOTE-HOST):/home/ec2-user/efs/srtm90
 
 build-deploy:
-	cd beanstalk && zip -r deploy-$(VERSION).zip . && cd ..
+	cd beanstalk && zip -r ../deployments/deploy-$(VERSION).zip . && cd ..
