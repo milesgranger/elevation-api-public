@@ -16,7 +16,8 @@ extern crate actix;
 
 
 use actix_web::{
-    http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, Responder, State, fs, Result
+    http, middleware, server, App, Error, HttpResponse, HttpRequest, Query, 
+    Responder, State, fs, Result
 };
 use std::collections::HashMap;
 use std::env;
@@ -153,7 +154,6 @@ fn main() {
 
         // Server
         let sys = actix::System::new("elevation-api");
-
         server::new(|| {
 
                 let tera = compile_templates!("./templates/**/*");
@@ -177,7 +177,19 @@ fn main() {
                     .resource("/", |r| r.method(http::Method::GET).with(index))
 
                     // Main elevation API
-                    .resource("/api/elevation", |r| r.method(http::Method::GET).f(get_elevations))
+                    .resource("/api/elevation", |r| {
+
+                        // Cors
+                        middleware::cors::Cors::build()
+                            .allowed_origin("*")
+                            .send_wildcard()
+                            .allowed_header(http::header::CONTENT_TYPE)
+                            .allowed_methods(vec!["GET"])
+                            .finish()
+                            .register(r);
+
+                        r.method(http::Method::GET).f(get_elevations)
+                    })
             })
             .bind("0.0.0.0:8000")
             .expect("Unable to bind to 0.0.0.0:8000")

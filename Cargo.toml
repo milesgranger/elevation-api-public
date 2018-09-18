@@ -1,6 +1,6 @@
 [package]
 name = "elevation-api"
-version = "1.0.14"
+version = "1.0.15"
 authors = ["Miles Granger <miles59923@gmail.com>"]
 
 [dependencies]

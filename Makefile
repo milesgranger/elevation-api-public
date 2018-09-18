@@ -1,15 +1,15 @@
 # Deploy steps:
 # 1. make test
-# 2. make build-images
-# 3. make start-docker-server -> test locally
-# 4. Update version HERE, Cargo.toml and in beanstalk/Dockerrun.aws.json
+# 2. Update version HERE, Cargo.toml and in beanstalk/Dockerrun.aws.json
+# 3. make build-images
+# 4. make start-docker-server -> test locally
 # 5. make build-deploy && make deploy
 # 6. Test on staging
 # 7. Deploy on prodution
 
 WORKDIR := $(shell pwd)
 DATE    := $(shell date +%s)
-VERSION := v1.0.14
+VERSION := v1.0.15
 
 test:
 	cargo test
