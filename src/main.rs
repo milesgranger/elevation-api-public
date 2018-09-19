@@ -98,6 +98,7 @@ fn get_elevations(req: &HttpRequest<AppState>) -> impl Responder {
 
             info!("Successfully processed {} points in {}ms", n_points, start.elapsed().as_millis());
             HttpResponse::Ok()
+                .header("Access-Control-Allow-Origin", "*")
                 .json(elevations_resp)
         },
         Err(_) => {
@@ -173,23 +174,17 @@ fn main() {
                             .expect("Can't find static directory!")
                             .show_files_listing())
 
-                    // Homepage
-                    .resource("/", |r| r.method(http::Method::GET).with(index))
-
-                    // Main elevation API
-                    .resource("/api/elevation", |r| {
-
-                        // Cors
-                        middleware::cors::Cors::build()
-                            .allowed_origin("*")
+                    .configure(|app| {
+                        middleware::cors::Cors::for_app(app)
                             .send_wildcard()
-                            .allowed_header(http::header::CONTENT_TYPE)
-                            .allowed_methods(vec!["GET"])
-                            .finish()
-                            .register(r);
-
-                        r.method(http::Method::GET).f(get_elevations)
+                            .max_age(3600)
+                            .resource("/api/elevation", |r| {
+                                r.method(http::Method::GET).f(get_elevations)
+                            })
+                            .resource("/", |r| r.method(http::Method::GET).with(index))
+                            .register()
                     })
+
             })
             .bind("0.0.0.0:8000")
             .expect("Unable to bind to 0.0.0.0:8000")
