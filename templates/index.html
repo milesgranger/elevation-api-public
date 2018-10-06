@@ -104,66 +104,19 @@
 
                                         <div>
                                             <p>
-                                                Welcome to a free service to get elevation data!
-                                                This service is free and will (try to) remain that way,
-                                                
-                                                <br/>
+                                                Welcome to a service to get elevation data!
+                                                This service is free and will (try to) remain that way. 
 
-                                                <strong>however</strong> consider the time and resources required for this,
-                                                and make a contribution below for what this service is worth to you! 
+                                                <hr>
 
-                                                <p>
-                                                    <strong>Suggested $10 per 1 million requests.</strong>
-                                                </p>
+                                                <em>Help keep this service running smoothly by making a donation below.</em>
                                             </p>
-                                            
-                                            
 
-                                            <div class="intro1 clearfix">
-
-                                                <h4>One time contribution:</h4>
-                                                <hr>
-
-                                                <form action="https://www.paypal.com/cgi-bin/webscr" method="post"
-                                                      target="_top">
-                                                    <input type="hidden" name="cmd" value="_s-xclick">
-                                                    <input type="hidden" name="hosted_button_id" value="75MLEHY4PR3MQ">
-                                                    <input type="image"
-                                                           src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
-                                                           border="0" name="submit"
-                                                           alt="PayPal - The safer, easier way to pay online!">
-                                                    <img alt="" border="0"
-                                                         src="https://www.paypalobjects.com/no_NO/i/scr/pixel.gif"
-                                                         width="1" height="1">
-                                                </form>
-
-                                            </div>
-
-                                            
-
-                                            <div class="intro1 clearfix">
-
-                                                <h4>For regular users:</h4>
-                                                <hr>
-
-                                                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                                                    <input type="hidden" name="cmd" value="_s-xclick">
-                                                    <input type="hidden" name="hosted_button_id" value="PZXFXFUPMMP5A">
-                                                    <table>
-                                                    <tr><td><input type="hidden" name="on0" value="Suggested regular user amounts">Suggested regular user amounts</td></tr><tr><td><select name="os0">
-                                                        <option value="High User">High User : $10 USD - Weekly</option>
-                                                        <option value="Regular User">Regular User : $10 USD - Montly</option>
-                                                        <option value="Hobby User">Hobby User : $10 USD - Yearly</option>
-                                                    </select> </td></tr>
-                                                    <tr><td><input type="hidden" name="on1" value="Comments & Suggestions">Comments & Suggestions</td></tr><tr><td><input type="text" name="os1" maxlength="200"></td></tr>
-                                                    </table>
-                                                    <input type="hidden" name="currency_code" value="USD">
-                                                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-                                                    <img alt="" border="0" src="https://www.paypalobjects.com/no_NO/i/scr/pixel.gif" width="1" height="1">
-                                                </form>
-                                            </div>
-                                                
-
+                                            <p>
+                                                <script src="https://donorbox.org/widget.js" paypalExpress="false"></script>
+                                                <iframe src="https://donorbox.org/embed/elevation-api?show_content=true&default_interval=m" height="685px" width="100%" style="max-width:100%; min-width:100%; max-height:none!important" seamless="seamless" name="donorbox" frameborder="0" scrolling="no" allowpaymentrequest>
+                                                </iframe>
+                                            </p>
                                         </div>
                                     </div>
 
@@ -189,14 +142,13 @@
 
                                 <p>
                                     <i>
-                                        Elevations are available at 90m resolution, and any points not found or are otherwise 
-                                        at sea level are reported as <em>-9999</em>
+                                        Elevations are available at 90m resolution, and any points not found are reported as <em>-9999</em>
                                     </i>
                                 </p>
 
                                 <h4>Example:</h4>
                                     <code>
-                                        curl https://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)
+                                        curl "https://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)"
                                     </code>
                                     <p>
                                         Results in:
@@ -236,7 +188,7 @@
                                 <p>
                                     Copyright &copy; Miles Granger - elevation-api.io
                                     <br>
-                                    <a href="https://github.com/milesgranger/elevation-api/issues/new">Submit any issues found here</a>
+                                    <a href="https://github.com/milesgranger/elevation-api/issues/new">Having an issue with the API? Submit it here!</a>
                                 </p>
                             </div>
                         </div>
