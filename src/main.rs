@@ -1,18 +1,19 @@
 #![feature(duration_as_u128)]
 
-#[macro_use] pub extern crate serde_derive;
-#[macro_use] pub extern crate log;
-#[macro_use] pub extern crate serde_json;
+extern crate serde_derive;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_json;
 #[macro_use] extern crate tera;
 #[macro_use] extern crate lazy_static;
-pub extern crate netcdf;
-pub extern crate ndarray;
-pub extern crate glob;
-pub extern crate serde;
-pub extern crate actix_web;
-pub extern crate env_logger;
+extern crate netcdf;
+extern crate ndarray;
+extern crate glob;
+extern crate serde;
+extern crate actix_web;
+extern crate env_logger;
 extern crate clap;
 extern crate actix;
+extern crate elevation_lib;
 
 
 use actix_web::{
@@ -26,15 +27,9 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use clap::{Arg, App as ClapApp, SubCommand};
-use glob::glob;
 
-
-// Local mods
-#[cfg(test)]
-mod tests;
-mod elevation;
-mod json_structs;
-use json_structs::{Points};
+use elevation_lib::elevation;
+use elevation_lib::json_structs::{Points};
 use elevation::ElevationTileFileMetaData;
 
 
