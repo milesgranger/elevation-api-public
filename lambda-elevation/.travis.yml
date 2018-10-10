@@ -1,0 +1,52 @@
+# required for docker
+sudo: required
+
+# for more information on configuring a rust travis build
+# see https://docs.travis-ci.com/user/languages/rust/
+language: rust
+
+# improve ci turnaround time
+cache:
+  cargo: true
+  apt: true
+  directories:
+    - node_modules
+
+services:
+  # start docker to enable lambda ci compatible build env
+  - docker
+
+addons:
+  apt:
+    packages:
+      # required by tarpaulin code coverage tool
+      - libssl-dev
+
+install: |
+  # https://github.com/xd009642/tarpaulin/issues/150
+  rustup toolchain install nightly
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]] && [[ $(cargo +nightly tarpaulin --version) != *0.6.2 ]]; then
+    `RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo +nightly install  --force --version 0.6.2  cargo-tarpaulin`
+  fi
+
+script:
+  - cargo test
+  # package application here to cache build artifacts for future build/deploys
+  - make package
+
+after_success:
+  # report coverage to coveralls
+  # see https://github.com/xd009642/tarpaulin for more information
+  - cargo  +nightly tarpaulin --ciserver travis-ci --coveralls $TRAVIS_JOB_ID || true
+
+# deploy on pushes to master branch
+# assumes aws credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+# are configured in travis settings
+# see https://serverless.com/framework/docs/providers/aws/guide/credentials/
+# for more information
+deploy:
+  - provider: script
+    script: make dependencies deploy
+    skip_cleanup: true
+    on:
+      branch: master
