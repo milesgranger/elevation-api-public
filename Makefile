@@ -13,7 +13,7 @@ VERSION := v1.0.17
 
 test:
 	cargo test
-
+	
 run:
 	cargo run --release -- run-server $(WORKDIR)/srtm90/processed
 

@@ -1,0 +1,22 @@
+service: lambda-elevation
+provider:
+  name: aws
+  runtime: python3.6
+  memorySize: 128
+plugins:
+  - serverless-rust
+custom:
+  rust:
+    cargoFlags: '--features python3-sys'
+package:
+  individually: true
+  exclude:
+    - ./**
+functions:
+  elevation:
+    handler: liblambda.handler
+    package:
+      include:
+        - liblambda.so
+    events:
+      - schedule: rate(5 minutes)

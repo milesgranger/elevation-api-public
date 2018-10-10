@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 use netcdf;
 use ndarray::ArrayD;
-use glob;
+use glob::glob;
 use serde_json;
 
 
@@ -231,7 +231,7 @@ pub fn get_elevations(coords: &[(f64, f64)], metas: &[ElevationTileFileMetaData]
             if (lat >= &resource.coords[0] && lat <= &resource.coords[1]) &&
                 (lon >= &resource.coords[2] && lon <= &resource.coords[3]) {
 
-                let mut elevation;
+                let elevation;
 
                 // ElevationTile has been opened and resides in the tiles HashMap...
                 if tiles.contains_key(&resource.file) {

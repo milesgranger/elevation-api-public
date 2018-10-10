@@ -19,3 +19,5 @@ build/
 __pycache__/
 .vscode/
 !src/tests/data/n58e104.nc
+lambda-elevation-api/target/
+*/node_modules/
