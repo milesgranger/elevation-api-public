@@ -1,18 +1,19 @@
 #![feature(duration_as_u128)]
 
-#[macro_use] pub extern crate serde_derive;
-#[macro_use] pub extern crate log;
-#[macro_use] pub extern crate serde_json;
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_json;
 #[macro_use] extern crate tera;
 #[macro_use] extern crate lazy_static;
-pub extern crate netcdf;
-pub extern crate ndarray;
-pub extern crate glob;
-pub extern crate serde;
-pub extern crate actix_web;
-pub extern crate env_logger;
+extern crate netcdf;
+extern crate ndarray;
+extern crate glob;
+extern crate serde;
+extern crate actix_web;
+extern crate env_logger;
 extern crate clap;
 extern crate actix;
+extern crate listenfd;
 
 
 use actix_web::{
@@ -27,6 +28,7 @@ use std::time::Instant;
 
 use clap::{Arg, App as ClapApp, SubCommand};
 use glob::glob;
+use listenfd::ListenFd;
 
 
 // Local mods
@@ -155,7 +157,7 @@ fn main() {
 
         // Server
         let sys = actix::System::new("elevation-api");
-        server::new(|| {
+        let mut server = server::new(|| {
 
                 let tera = compile_templates!("./templates/**/*");
 
@@ -185,10 +187,16 @@ fn main() {
                             .register()
                     })
 
-            })
-            .bind("0.0.0.0:8000")
-            .expect("Unable to bind to 0.0.0.0:8000")
-            .start();
+            });
+
+        let mut listenfd = ListenFd::from_env();
+        server = if let Some(l) = listenfd.take_tcp_listener(0).unwrap() {
+            server.listen(l)
+        } else {
+            server.bind("127.0.0.1:8000").unwrap()
+        };
+
+        server.start();
 
         info!("Started server running on 0.0.0.0:8000");
         let _ = sys.run();

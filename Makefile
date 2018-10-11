@@ -11,6 +11,9 @@ WORKDIR := $(shell pwd)
 DATE    := $(shell date +%s)
 VERSION := v1.0.17
 
+dev-server:
+	systemfd --no-pid -s http::8000 -- cargo watch -x "run -- run-server ~/elevation-data/srtm90"
+
 test:
 	cargo test
 
