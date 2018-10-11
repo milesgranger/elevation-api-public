@@ -68,6 +68,14 @@
                             <p class="lead">
                                 Get elevations for up to 50 points at a time, for free. :)
                             </p>
+
+                            <p>
+                                Elevations are given at 360 meter resolution for free, 90 meters for $10 per 25k requests.
+                                ($0.0004 per request)!
+                                <p>
+                                    <em>...this is ~25x cheaper than other elevation APIs!</em> 
+                                </p>
+                            </p>
                         </div>
                         <!-- end title -->
                     </div>
@@ -105,11 +113,36 @@
                                         <div>
                                             <p>
                                                 Welcome to a service to get elevation data!
-                                                This service is free and will (try to) remain that way. 
+                                                This service is free and will (try to) remain that way for 360 meter resolution elevation readings. 
+                                                
+                                                Sign up for a premium account (which is <em>significantly</em> cheaper than other API services) for 90 meter resolutions!
 
                                                 <hr>
 
-                                                <em>Help keep this service running smoothly by making a donation below.</em>
+                                                <h3>For 90 meter resolution elevation access, follow these steps:</h3>
+
+                                                <ol>
+                                                    <li>
+                                                        Click "Generate API Key" button to get an API key, or submit your existing one to add to your balance
+                                                    </li>
+                                                    <li>
+                                                        After checkout you can append <code>?key=my-api-key</code> to your requests and you will receive <strong>90 meter</strong>
+                                                        resolution instead of the standard 360 meter resolution elevation readings.
+                                                    </li>
+                                                    <li>
+                                                        Submit a request to <code>https://elevation-api.io/api/info?key=my-api-key</code> to get information
+                                                        about your key's usage and balance.
+                                                    </li>
+                                                </ol>
+                                            </p>
+
+                                            <p>
+                                                <strong>
+                                                    Please note!
+                                                </strong>
+                                                <p>
+                                                    Keep your key safe, there is <strong>NO</strong> recovery system for a lost key!
+                                                </p>
                                             </p>
 
                                             <p>
@@ -146,7 +179,7 @@
                                     </i>
                                 </p>
 
-                                <h4>Example:</h4>
+                                <h4>Example <em>without</em> an API key:</h4>
                                     <code>
                                         curl "https://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)"
                                     </code>
@@ -160,7 +193,28 @@
             [
                 {"lat":39.90974, "lon":-106.17188, "elevation":2606.0},
                 {"lat":62.52417, "lon":10.02487,   "elevation":1060.0}
-            ]
+            ],
+        "resolution": 360
+    }
+</code>
+                                    </pre>
+
+                                <h4>Example <em>with</em> an API key:</h4>
+                                    <code>
+                                        curl "https://elevation-api.io/api/elevation?points=(39.90974,-106.17188),(62.52417,10.02487)&key=k20sLaw8Kno3pwh7Opx32owh21ca"
+                                    </code>
+                                    <p>
+                                        Results in:
+                                    </p>
+                                    <pre>
+<code>
+    {
+        "elevations":
+            [
+                {"lat":39.90974, "lon":-106.17188, "elevation":2606.0},
+                {"lat":62.52417, "lon":10.02487,   "elevation":1060.0}
+            ],
+        "resolution": 90
     }
 </code>
                                     </pre>
